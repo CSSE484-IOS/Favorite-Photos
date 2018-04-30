@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>311448211146-bvaor3bu14osqu84487vcoklto7n8stb.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.311448211146-bvaor3bu14osqu84487vcoklto7n8stb</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCIZfoVlMHC6HDNGh8_EnJgoamXBMK-kOY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>311448211146</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>edu.rosehulman.fengy2.Favorite-Photos</string>
+	<key>PROJECT_ID</key>
+	<string>fengy2-favorite-photos</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fengy2-favorite-photos.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:311448211146:ios:91461d68b8cd8032</string>
+	<key>DATABASE_URL</key>
+	<string>https://fengy2-favorite-photos.firebaseio.com</string>
+</dict>
+</plist>
