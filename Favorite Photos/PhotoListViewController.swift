@@ -7,24 +7,36 @@
 //
 
 import UIKit
+import Firebase
 
-class PhotoListViewController: UIViewController {
+class PhotoListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+    
+    let photoCellIdentifier = "PhotoCell"
 
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    var dataSnapshots = [DocumentSnapshot]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    @IBAction func pressedFab(_ sender: Any) {
     }
-    */
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return dataSnapshots.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoCellIdentifier, for: indexPath) as! PhotoCollectionViewCell
+        
+        //configure the cell
+//        cell.captionLabel.text = "Best photo ever!"
+//        cell.imageView.image = #imageLiteral(resourceName: "fab")
+        cell.display(snapshot: dataSnapshots[indexPath.row])
+        
+        return cell
+    }
 
 }

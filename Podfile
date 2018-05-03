@@ -9,5 +9,6 @@ target 'Favorite Photos' do
   pod 'Firebase/Core'
   pod 'Firebase/Firestore'
   pod 'Firebase/Storage'
+  pod 'Kingfisher', '~> 4.0'
 
 end

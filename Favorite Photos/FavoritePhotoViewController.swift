@@ -14,10 +14,31 @@ class FavoritePhotoViewController: UIViewController{
     @IBOutlet weak var progressView: UIProgressView!
     
     var photoStorageRef: StorageReference!
+    var photoDocRef: DocumentReference!
+    var photoListener: ListenerRegistration!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         photoStorageRef = Storage.storage().reference(withPath: "favorite")
+        photoDocRef = Firestore.firestore().collection("favorite").document("photo")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        photoListener = photoDocRef.addSnapshotListener({ (snapshot, error) in
+            if let error = error {
+                print("Error getting the Firestore document. Error: \(error.localizedDescription)")
+            }
+            if let url = snapshot?.get("url") as? String {
+                print("Loading image from url")
+                ImageUtils.load(imageView: self.imageView, from: url)
+            }
+        })
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        photoListener.remove()
     }
 
     @IBAction func pressedFab(_ sender: Any) {
@@ -32,8 +53,8 @@ class FavoritePhotoViewController: UIViewController{
         present(imagePicker, animated: true)
     }
     
-    func uploadImage(_ data: Data?) {
-        guard let data = data else { return }
+    func uploadImage(_ image: UIImage) {
+        guard let data = UIImageJPEGRepresentation(image, 0.5) else { return }
         let uploadMetadata = StorageMetadata()
         uploadMetadata.contentType = "image/jpeg"
         progressView.isHidden = false
@@ -51,6 +72,15 @@ class FavoritePhotoViewController: UIViewController{
         uploadTask.observe(.success) { (snapshot) in
             self.progressView.isHidden = true
             print("Your upload is finished")
+            self.photoStorageRef.downloadURL(completion: { (url, error) in
+                if let error = error {
+                    print("Error getting the download url. Error: \(error.localizedDescription)")
+                }
+                if let url = url {
+                    print("Saving the url \(url.absoluteString)")
+                    self.photoDocRef.setData(["url" : url.absoluteString])
+                }
+            })
         }
     }
 }
@@ -65,7 +95,7 @@ extension FavoritePhotoViewController: UINavigationControllerDelegate, UIImagePi
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
 //            self.imageView.image = image
-            uploadImage(UIImageJPEGRepresentation(image, 0.5))
+            uploadImage(image)
         }
         picker.dismiss(animated: true)
     }
