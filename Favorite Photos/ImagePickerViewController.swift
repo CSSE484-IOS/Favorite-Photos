@@ -22,7 +22,6 @@ class ImagePickerViewController: UIViewController {
         } else {
             imagePicker.sourceType = .photoLibrary
         }
-        
         present(imagePicker, animated: true)
     }
     

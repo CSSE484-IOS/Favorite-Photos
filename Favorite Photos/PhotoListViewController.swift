@@ -15,10 +15,40 @@ class PhotoListViewController: ImagePickerViewController, UICollectionViewDataSo
 
     @IBOutlet weak var collectionView: UICollectionView!
     
+    let itemsPerRow = 2
+    let sectionInsets = UIEdgeInsets(top: 30.0, left: 10.0, bottom: 30.0, right: 10.0)
+    
+    var photosStorageRef: StorageReference!
+    var photosCollectionRef: CollectionReference!
+    var photosListener: ListenerRegistration!
+    
     var dataSnapshots = [DocumentSnapshot]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        photosStorageRef = Storage.storage().reference(withPath: "photos")
+        photosCollectionRef = Firestore.firestore().collection("photos")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        photosListener = photosCollectionRef
+            .order(by: "created", descending: true).limit(to: 12)
+            .addSnapshotListener({ (querySnapshot, error) in
+            if let error = error {
+                print("Error getting firestore photos. Error: \(error.localizedDescription)")
+                return
+            }
+            if let snapshot = querySnapshot {
+                self.dataSnapshots = snapshot.documents
+                self.collectionView.reloadData()
+            }
+        })
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        photosListener.remove()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -27,17 +57,53 @@ class PhotoListViewController: ImagePickerViewController, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: photoCellIdentifier, for: indexPath) as! PhotoCollectionViewCell
-        
-        //configure the cell
-//        cell.captionLabel.text = "Best photo ever!"
-//        cell.imageView.image = #imageLiteral(resourceName: "fab")
         cell.display(snapshot: dataSnapshots[indexPath.row])
         
         return cell
     }
     
     override func uploadImage(_ image: UIImage) {
-        print("TODO: upload the image")
+        guard let data = ImageUtils.resize(image: image) else { return }
+        let uploadMetadata = StorageMetadata()
+        uploadMetadata.contentType = "image/jpeg"
+        
+        let photoDocRef = photosCollectionRef.document()
+        let photoStorageRef = photosStorageRef.child(photoDocRef.documentID)
+        
+        photoStorageRef.putData(data, metadata: uploadMetadata) { (metadata, error) in
+            if let error = error {
+                print("Error with upload \(error.localizedDescription)")
+                return
+            }
+            
+            photoStorageRef.downloadURL(completion: { (url, error) in
+                if let error = error {
+                    print("Error getting the download url. Error: \(error.localizedDescription)")
+                }
+                if let url = url {
+                    photoDocRef.setData(["url" : url.absoluteString,
+                                         "caption" : "Best photo ever!",
+                                         "created" : Date()])
+                }
+            })
+        }
     }
 
+}
+
+extension PhotoListViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let paddingSpace = sectionInsets.left * CGFloat(itemsPerRow + 1)
+        let availableWidth = view.frame.width - paddingSpace
+        let widthPerItem = availableWidth / CGFloat(itemsPerRow)
+        return CGSize(width: widthPerItem, height: widthPerItem)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return sectionInsets
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return sectionInsets.left
+    }
 }
