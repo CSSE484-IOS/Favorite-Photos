@@ -39,7 +39,12 @@ class PhotoListViewController: ImagePickerViewController, UICollectionViewDataSo
                 print("Error getting firestore photos. Error: \(error.localizedDescription)")
                 return
             }
+                
             if let snapshot = querySnapshot {
+                let source = snapshot.metadata.hasPendingWrites ? "Local " : "Server "
+                let fromCache = snapshot.metadata.isFromCache ? "from cache" : "not using cache"
+                print(source + fromCache)
+                
                 self.dataSnapshots = snapshot.documents
                 self.collectionView.reloadData()
             }
