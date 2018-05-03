@@ -51,6 +51,18 @@ class PhotoListViewController: ImagePickerViewController, UICollectionViewDataSo
         photosListener.remove()
     }
     
+    func getCaption(_ documentRef: DocumentReference) {
+        let ac = UIAlertController(title: "Set image caption", message: "", preferredStyle: .alert)
+        ac.addTextField { (textField) in
+            textField.placeholder = "Image caption"
+        }
+        ac.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+            let captionTextField = ac.textFields![0]
+            documentRef.updateData(["caption" : captionTextField.text!])
+        }))
+        present(ac, animated: true)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSnapshots.count
     }
@@ -69,6 +81,10 @@ class PhotoListViewController: ImagePickerViewController, UICollectionViewDataSo
         
         let photoDocRef = photosCollectionRef.document()
         let photoStorageRef = photosStorageRef.child(photoDocRef.documentID)
+        
+        DispatchQueue.main.async {
+            self.getCaption(photoDocRef)
+        }
         
         photoStorageRef.putData(data, metadata: uploadMetadata) { (metadata, error) in
             if let error = error {
