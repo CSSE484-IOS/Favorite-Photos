@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class PhotoListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class PhotoListViewController: ImagePickerViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     let photoCellIdentifier = "PhotoCell"
 
@@ -19,9 +19,6 @@ class PhotoListViewController: UIViewController, UICollectionViewDataSource, UIC
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
-    
-    @IBAction func pressedFab(_ sender: Any) {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -37,6 +34,10 @@ class PhotoListViewController: UIViewController, UICollectionViewDataSource, UIC
         cell.display(snapshot: dataSnapshots[indexPath.row])
         
         return cell
+    }
+    
+    override func uploadImage(_ image: UIImage) {
+        print("TODO: upload the image")
     }
 
 }
